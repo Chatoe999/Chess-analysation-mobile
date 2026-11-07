@@ -132,7 +132,9 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:8px;height:8px;bor
 const $=s=>document.querySelector(s),MATE=1e4,CS='abcdefgh';
 const K={brilliant:['Блестящий ход','!!','#26c9c3'],great:['Отличный ход','!','#5b8def'],best:['Лучший ход','★','#81b64c'],excellent:['Очень хороший ход','✓','#96bc4b'],good:['Хороший ход','✓','#8fa876'],book:['Дебютный ход','≡','#a88865'],inacc:['Неточность','?!','#f7c631'],mistake:['Ошибка','?','#ffa459'],miss:['Упущенный шанс','✕','#ff7769'],blunder:['Зевок','??','#fa412d']};
 const PG={k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟\uFE0E'},PV={p:1,n:3,b:3,r:5,q:9,k:0};
-const ENG=['stockfish.js','https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js','https://cdn.jsdelivr.net/npm/stockfish.js@10.0.2/stockfish.js'];
+/* Настройки движка: быстрый режим для телефона; MultiPV=2 остаётся включённым. */
+const ENGINE_DEPTH=10,ENGINE_MOVETIME=350;
+const ENG=['https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js','https://cdn.jsdelivr.net/npm/stockfish.js@10.0.2/stockfish.js'];
 const ENGLOG=[];
 const dbg=t=>{const d=$('#dg');d.hidden=false;d.textContent+=t+'\n'};
 addEventListener('error',e=>dbg('Ошибка: '+e.message));
@@ -182,7 +184,9 @@ function ev(i){
     const n=+((/multipv (\d+)/.exec(t)||[0,1])[1]),v=+sc[2];
     L[n-1]={cp:s*(sc[1]==='cp'?v:(v>0?1:-1)*(MATE-Math.abs(v)*10)),pv:t.split(' pv ')[1].trim().split(' ')}}
    else if(t.startsWith('bestmove')){const l=L.filter(Boolean);ok({l:l.length?l:[{cp:0,pv:[]}]})}};
-  W.postMessage('position fen '+fen);W.postMessage('go depth 12 movetime 700')})}
+  // Меньше глубина и время на позицию сокращают общий разбор длинных партий.
+  W.postMessage('position fen '+fen);
+  W.postMessage('go depth '+ENGINE_DEPTH+' movetime '+ENGINE_MOVETIME)})}
 
 /* ---------- оценка ходов ---------- */
 function sac(i){const m=G.mv[i-1],pv=G.E[i].l[0].pv;if(PV[m.piece]<3||!pv[0])return 0;
