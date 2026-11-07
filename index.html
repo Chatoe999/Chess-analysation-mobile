@@ -155,7 +155,8 @@ const wp=c=>1/(1+Math.exp(-.00368208*c));
 const fmt=c=>Math.abs(c)>=9000?(c>0?'+':'−')+'M'+Math.round((MATE-Math.abs(c))/10):(c>0?'+':c<0?'−':'')+(Math.abs(c)/100).toFixed(1);
 const san=(f,u)=>{try{const m=new Chess(f).move({from:u.slice(0,2),to:u.slice(2,4),promotion:u[4]});return m?m.san:u}catch(e){return u}};
 const cap=i=>{const p=G.E[i].l[0].pv[0];return !!p&&!!new Chess(G.fens[i]).get(p.slice(2,4))};
-const mat=(f,c)=>{let s=0;new Chess(f).board().forEach(r=>r.forEach(p=>{if(p)s+=(p.color===c?1:-1)*PV[p.type]}));return s};
+const brd=f=>{const c=new Chess(f);return[8,7,6,5,4,3,2,1].map(r=>[...CS].map(x=>c.get(x+r)))};
+const mat=(f,c)=>{let s=0;brd(f).forEach(r=>r.forEach(p=>{if(p)s+=(p.color===c?1:-1)*PV[p.type]}));return s};
 const msg=t=>{$('#msg').textContent=t};
 const show=v=>{$('#home').hidden=v!=='home';$('#an').hidden=v!=='an'};
 
@@ -236,7 +237,7 @@ function graph(){const n=G.fens.length-1,E=G.E;if(n<1||!E.length)return;
  $('#gr').innerHTML='<rect width="100" height="30" fill="rgba(0,0,0,.3)"/><path d="M0,30L'+p.join('L')+'L'+((E.length-1)/n*100).toFixed(1)+',30Z" fill="rgba(255,255,255,.85)"/><line x1="0" x2="100" y1="15" y2="15" stroke="rgba(120,120,160,.7)" stroke-width="1" vector-effect="non-scaling-stroke"/><line x1="'+x+'" x2="'+x+'" y1="0" y2="30" stroke="#ff9f0a" stroke-width="2" vector-effect="non-scaling-stroke"/>'}
 
 function render(){if(!G)return;
- const g=G,m=ply?g.mv[ply-1]:0,k=g.k[ply],own=m?(m.color===g.me?'me':'op'):'',E=g.E[ply],b=new Chess(g.fens[ply]).board();
+ const g=G,m=ply?g.mv[ply-1]:0,k=g.k[ply],own=m?(m.color===g.me?'me':'op'):'',E=g.E[ply],b=brd(g.fens[ply]);
  [['#top',flip?'w':'b'],['#bot',flip?'b':'w']].forEach(([q,c])=>{const e=$(q);e.className='pl '+(c===g.me?'me':'op');e.dataset.c=c;
   e.innerHTML='<b>'+(c==='w'?g.w:g.b)+'</b><small>'+((c==='w'?g.wr:g.br)||'')+'</small><span>'+(c===g.me?'Ты':'Соперник')+'</span>'});
  const bm=m&&k&&/^(good|inacc|mistake|miss|blunder)$/.test(k)&&g.E[ply-1].l[0].pv[0];
