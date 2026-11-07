@@ -1,0 +1,16 @@
+{
+ "name": "Разбор партий",
+ "short_name": "Разбор",
+ "description": "Разбор партий Chess.com: оценка ходов, график и советы",
+ "lang": "ru",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#070614",
+ "theme_color": "#070614",
+ "icons": [
+  {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+  {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+  {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+ ]
+}
