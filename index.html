@@ -145,11 +145,9 @@ const SRC={
  chesscom:{n:'Chess.com',async games(u){
   const j=async x=>{const r=await fetch(x);if(!r.ok)throw 0;return r.json()};
   const a=(await j('https://api.chess.com/pub/player/'+encodeURIComponent(u)+'/games/archives')).archives||[];
-  let o=[];
-  for(const x of a.slice(-3).reverse()){o.push(...(await j(x)).games.reverse().filter(g=>g.pgn));if(o.length>=20)break}
-  return o.slice(0,20).map(g=>({pgn:g.pgn,w:g.white.username,b:g.black.username,wr:g.white.rating,br:g.black.rating,rs:{w:g.white.result,b:g.black.result},tc:g.time_class,t:g.end_time}))}},
- lichess:{n:'Lichess (скоро)',soon:1}
-};
+  const batches=await Promise.all(a.slice(-3).reverse().map(j));
+const o=batches.flatMap(x=>(x.games||[]).slice().reverse().filter(g=>g.pgn));
+return o.slice(0,20).map(g=>({pgn:g.pgn,w:g.white.username,b:g.black.username,wr:g.white.rating,br:g.black.rating,rs:{w:g.white.result,b:g.black.result},tc:g.time_class,t:g.end_time}))
 
 let G,W,ply=0,flip=0,run=0,SK='chesscom',games=[],user='';
 const wp=c=>1/(1+Math.exp(-.00368208*c));
