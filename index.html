@@ -226,7 +226,9 @@ async function analyze(){
  catch(e){ENGLOG.forEach(dbg);$('#st').textContent='Движок не загрузился, причины ниже';return}
  if(id!==run){W.terminate();return}
  for(let i=0;i<n;i++){G.E[i]=await ev(i);if(id!==run)return;if(i)grade(i);
-  $('#st').textContent='Анализ '+i+'/'+(n-1);$('#pg i').style.width=100*i/(n-1||1)+'%';render()}
+  $('#st').textContent='Анализ '+i+'/'+(n-1);
+  $('#pg i').style.width=100*i/(n-1||1)+'%';
+  if(i%8===0||i===n-1)render()}
  const S={w:{},b:{}},A={w:[],b:[]};
  G.mv.forEach((m,j)=>{const k=G.k[j+1];S[m.color][k]=(S[m.color][k]||0)+1;A[m.color].push(G.ac[j+1])});
  const acc=x=>x.length?Math.round(x.reduce((p,c)=>p+c,0)/x.length):0;
