@@ -109,6 +109,7 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:8px;height:8px;bor
  </details>
  <p id="msg" class="dim"></p>
  <div id="list" class="v"></div>
+ <p class="dim" style="text-align:center;font-size:11px;margin:0">версия 7</p>
 </section>
 
 <section id="an" class="v" hidden>
@@ -147,10 +148,13 @@ const SRC={
  chesscom:{n:'Chess.com',async games(u,prog){
   const get=async x=>{let r;try{r=await fetch(x)}catch(e){throw new Error('net')}
    if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){}
-    throw new Error(r.status===404?(/internal/i.test(m)?'internal':'404'):r.status===429?'429':'HTTP '+r.status)}return r};
-  const a=(await(await get('https://api.chess.com/pub/player/'+encodeURIComponent(u)+'/games/archives')).json()).archives||[];
-  const M='{"url":"https://www.chess.com/game/';let o=[];
-  const fails=[];
+    const er=new Error(r.status===404?(/internal/i.test(m)?'internal':'404'):r.status===429?'429':'HTTP '+r.status);er.det=r.status+' '+m+' '+x;throw er}return r};
+  const B='https://api.chess.com/pub/player/'+encodeURIComponent(u);
+  let a=[],le=null;
+  try{a=(await(await get(B+'/games/archives')).json()).archives||[]}catch(e){if(e.message!=='404'&&e.message!=='internal')throw e;le=e}
+  /* запасной путь: если список архивов не отдаётся, берём последние месяцы напрямую по календарю */
+  if(le){const d=new Date();for(let i=5;i>=0;i--){const t=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()-i,1));a.push(B+'/games/'+t.getUTCFullYear()+'/'+String(t.getUTCMonth()+1).padStart(2,'0'))}}
+  const M='{"url":"https://www.chess.com/game/';let o=[];const fails=[];
   for(const x of a.slice(-6).reverse()){
    let r;try{r=await get(x)}catch(e){fails.push(x.split('/').slice(-2).join('/')+' ('+e.message+')');continue}
    let t='',n=0;
@@ -162,6 +166,7 @@ const SRC={
    while(k<25){const q=t.lastIndexOf(M,p-1);if(q<0)break;p=q;k++;if(!q)break}
    const gs=k?JSON.parse('['+t.slice(p).replace(/\]\s*\}\s*$/,'')+']'):JSON.parse(t).games;
    o.push(...gs.reverse().filter(g=>g.pgn&&g.white&&g.black));if(o.length>=20)break}
+  if(!o.length&&le)throw le;
   if(!o.length&&fails.length)throw new Error('months:'+fails.join(', '));
   return o.slice(0,20).map(g=>({pgn:g.pgn,w:g.white.username||'?',b:g.black.username||'?',wr:g.white.rating,br:g.black.rating,rs:{w:g.white.result,b:g.black.result},tc:g.time_class,t:g.end_time}))}},
  lichess:{n:'Lichess (скоро)',soon:1}
@@ -312,7 +317,7 @@ $('#f').onsubmit=async e=>{e.preventDefault();const u=$('#u').value.trim().toLow
  try{localStorage.cu=u}catch(x){}
  msg('Загружаю партии… (у активных игроков это может занять время)');$('#list').innerHTML='';
  try{games=await SRC[SK].games(u,n=>msg('Загружаю партии… '+(n/1048576).toFixed(1)+' МБ'));msg(games.length?'':'Партий не найдено');list()}
- catch(x){const m=(x&&x.message)||'';msg(m==='404'?'Игрок не найден. Проверь ник.':m==='429'?'Chess.com просит подождать. Попробуй через минуту.':m==='net'?'Нет связи с Chess.com. Проверь интернет.':m==='internal'||m.startsWith('months:')?'Chess.com сейчас не отдаёт партии этого игрока: внутренняя ошибка на их стороне'+(m.startsWith('months:')?' ('+m.slice(7)+')':'')+'. Попробуй позже или вставь PGN нужной партии ниже.':'Не получилось загрузить ('+m+'). Можно вставить PGN ниже.')}};
+ catch(x){const m=(x&&x.message)||'',dt=x&&x.det?' ['+x.det+']':'';msg((m==='404'?'Игрок не найден. Проверь ник.':m==='429'?'Chess.com просит подождать. Попробуй через минуту.':m==='net'?'Нет связи с Chess.com. Проверь интернет.':m==='internal'||m.startsWith('months:')?'Chess.com сейчас не отдаёт партии этого игрока: внутренняя ошибка на их стороне'+(m.startsWith('months:')?' ('+m.slice(7)+')':'')+'. Попробуй позже или вставь PGN нужной партии ниже.':'Не получилось загрузить ('+m+'). Можно вставить PGN ниже.')+dt)}};
 $('#list').onclick=e=>{const b=e.target.closest('[data-i]');if(b){const g=games[+b.dataset.i];openGame(g,g.w.toLowerCase()===user?'w':'b')}};
 $('#pb').onclick=()=>{const p=$('#p').value.trim();if(p)openGame({pgn:p})};
 $('#mv').onclick=e=>{const b=e.target.closest('[data-i]');if(b)go(+b.dataset.i)};
