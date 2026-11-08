@@ -146,11 +146,14 @@ const DRAW=['agreed','repetition','stalemate','insufficient','50move','timevsins
 const SRC={
  chesscom:{n:'Chess.com',async games(u,prog){
   const get=async x=>{let r;try{r=await fetch(x)}catch(e){throw new Error('net')}
-   if(!r.ok)throw new Error(r.status===404?'404':r.status===429?'429':'HTTP '+r.status);return r};
+   if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){}
+    throw new Error(r.status===404?(/internal/i.test(m)?'internal':'404'):r.status===429?'429':'HTTP '+r.status)}return r};
   const a=(await(await get('https://api.chess.com/pub/player/'+encodeURIComponent(u)+'/games/archives')).json()).archives||[];
   const M='{"url":"https://www.chess.com/game/';let o=[];
-  for(const x of a.slice(-3).reverse()){
-   const r=await get(x);let t='',n=0;
+  const fails=[];
+  for(const x of a.slice(-6).reverse()){
+   let r;try{r=await get(x)}catch(e){fails.push(x.split('/').slice(-2).join('/')+' ('+e.message+')');continue}
+   let t='',n=0;
    /* у активных игроков архив месяца весит десятки МБ: читаем потоком и держим в памяти только хвост */
    if(r.body&&r.body.getReader){const rd=r.body.getReader(),dc=new TextDecoder();
     for(;;){const ch=await rd.read();if(ch.done)break;n+=ch.value.length;t+=dc.decode(ch.value,{stream:true});if(t.length>1.5e6)t=t.slice(-8e5);if(prog)prog(n)}
@@ -159,6 +162,7 @@ const SRC={
    while(k<25){const q=t.lastIndexOf(M,p-1);if(q<0)break;p=q;k++;if(!q)break}
    const gs=k?JSON.parse('['+t.slice(p).replace(/\]\s*\}\s*$/,'')+']'):JSON.parse(t).games;
    o.push(...gs.reverse().filter(g=>g.pgn&&g.white&&g.black));if(o.length>=20)break}
+  if(!o.length&&fails.length)throw new Error('months:'+fails.join(', '));
   return o.slice(0,20).map(g=>({pgn:g.pgn,w:g.white.username||'?',b:g.black.username||'?',wr:g.white.rating,br:g.black.rating,rs:{w:g.white.result,b:g.black.result},tc:g.time_class,t:g.end_time}))}},
  lichess:{n:'Lichess (скоро)',soon:1}
 };
@@ -308,7 +312,7 @@ $('#f').onsubmit=async e=>{e.preventDefault();const u=$('#u').value.trim().toLow
  try{localStorage.cu=u}catch(x){}
  msg('Загружаю партии… (у активных игроков это может занять время)');$('#list').innerHTML='';
  try{games=await SRC[SK].games(u,n=>msg('Загружаю партии… '+(n/1048576).toFixed(1)+' МБ'));msg(games.length?'':'Партий не найдено');list()}
- catch(x){const m=x&&x.message;msg(m==='404'?'Игрок не найден. Проверь ник.':m==='429'?'Chess.com просит подождать. Попробуй через минуту.':m==='net'?'Нет связи с Chess.com. Проверь интернет. У очень активных игроков архив бывает огромным: тогда вставь PGN нужной партии.':'Не получилось загрузить ('+m+'). Можно вставить PGN ниже.')}};
+ catch(x){const m=(x&&x.message)||'';msg(m==='404'?'Игрок не найден. Проверь ник.':m==='429'?'Chess.com просит подождать. Попробуй через минуту.':m==='net'?'Нет связи с Chess.com. Проверь интернет.':m==='internal'||m.startsWith('months:')?'Chess.com сейчас не отдаёт партии этого игрока: внутренняя ошибка на их стороне'+(m.startsWith('months:')?' ('+m.slice(7)+')':'')+'. Попробуй позже или вставь PGN нужной партии ниже.':'Не получилось загрузить ('+m+'). Можно вставить PGN ниже.')}};
 $('#list').onclick=e=>{const b=e.target.closest('[data-i]');if(b){const g=games[+b.dataset.i];openGame(g,g.w.toLowerCase()===user?'w':'b')}};
 $('#pb').onclick=()=>{const p=$('#p').value.trim();if(p)openGame({pgn:p})};
 $('#mv').onclick=e=>{const b=e.target.closest('[data-i]');if(b)go(+b.dataset.i)};
