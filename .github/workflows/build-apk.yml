@@ -8,7 +8,7 @@ on:
       - '.github/workflows/build-apk.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -47,10 +47,22 @@ jobs:
       - name: Build debug APK
         run: gradle -p android-project/ChessAnalysis-Android-project --no-daemon assembleDebug
 
-      - name: Upload APK
+      - name: Upload APK as workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: chess-analysis-apk
           path: android-project/ChessAnalysis-Android-project/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish APK to the latest GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Android APK
+          body: |
+            Последняя автоматически собранная версия Chess Analysis Mobile для Android.
+            Скачайте файл ChessAnalysis.apk в разделе Assets.
+          files: android-project/ChessAnalysis-Android-project/app/build/outputs/apk/debug/app-debug.apk
+          overwrite_files: true
+          make_latest: true
