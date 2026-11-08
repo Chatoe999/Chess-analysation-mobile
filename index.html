@@ -144,12 +144,22 @@ const DRAW=['agreed','repetition','stalemate','insufficient','50move','timevsins
 /* Источники партий. Чтобы добавить Lichess: реализуй games(user) и верни
    [{pgn,w,b,wr,br,rs:{w,b},tc,t}] — остальное приложение менять не нужно. */
 const SRC={
- chesscom:{n:'Chess.com',async games(u){
-  const j=async x=>{const r=await fetch(x);if(!r.ok)throw 0;return r.json()};
-  const a=(await j('https://api.chess.com/pub/player/'+encodeURIComponent(u)+'/games/archives')).archives||[];
-  let o=[];
-  for(const x of a.slice(-3).reverse()){o.push(...(await j(x)).games.reverse().filter(g=>g.pgn));if(o.length>=20)break}
-  return o.slice(0,20).map(g=>({pgn:g.pgn,w:g.white.username,b:g.black.username,wr:g.white.rating,br:g.black.rating,rs:{w:g.white.result,b:g.black.result},tc:g.time_class,t:g.end_time}))}},
+ chesscom:{n:'Chess.com',async games(u,prog){
+  const get=async x=>{let r;try{r=await fetch(x)}catch(e){throw new Error('net')}
+   if(!r.ok)throw new Error(r.status===404?'404':r.status===429?'429':'HTTP '+r.status);return r};
+  const a=(await(await get('https://api.chess.com/pub/player/'+encodeURIComponent(u)+'/games/archives')).json()).archives||[];
+  const M='{"url":"https://www.chess.com/game/';let o=[];
+  for(const x of a.slice(-3).reverse()){
+   const r=await get(x);let t='',n=0;
+   /* у активных игроков архив месяца весит десятки МБ: читаем потоком и держим в памяти только хвост */
+   if(r.body&&r.body.getReader){const rd=r.body.getReader(),dc=new TextDecoder();
+    for(;;){const ch=await rd.read();if(ch.done)break;n+=ch.value.length;t+=dc.decode(ch.value,{stream:true});if(t.length>1.5e6)t=t.slice(-8e5);if(prog)prog(n)}
+    t+=dc.decode()}else t=await r.text();
+   let p=t.length,k=0;
+   while(k<25){const q=t.lastIndexOf(M,p-1);if(q<0)break;p=q;k++;if(!q)break}
+   const gs=k?JSON.parse('['+t.slice(p).replace(/\]\s*\}\s*$/,'')+']'):JSON.parse(t).games;
+   o.push(...gs.reverse().filter(g=>g.pgn&&g.white&&g.black));if(o.length>=20)break}
+  return o.slice(0,20).map(g=>({pgn:g.pgn,w:g.white.username||'?',b:g.black.username||'?',wr:g.white.rating,br:g.black.rating,rs:{w:g.white.result,b:g.black.result},tc:g.time_class,t:g.end_time}))}},
  lichess:{n:'Lichess (скоро)',soon:1}
 };
 
@@ -296,9 +306,9 @@ try{$('#u').value=localStorage.cu||''}catch(e){}
 
 $('#f').onsubmit=async e=>{e.preventDefault();const u=$('#u').value.trim().toLowerCase();if(!u)return;user=u;
  try{localStorage.cu=u}catch(x){}
- msg('Загружаю партии…');$('#list').innerHTML='';
- try{games=await SRC[SK].games(u);msg(games.length?'':'Партий не найдено');list()}
- catch(x){msg('Не получилось загрузить. Проверь ник и интернет или вставь PGN ниже.')}};
+ msg('Загружаю партии… (у активных игроков это может занять время)');$('#list').innerHTML='';
+ try{games=await SRC[SK].games(u,n=>msg('Загружаю партии… '+(n/1048576).toFixed(1)+' МБ'));msg(games.length?'':'Партий не найдено');list()}
+ catch(x){const m=x&&x.message;msg(m==='404'?'Игрок не найден. Проверь ник.':m==='429'?'Chess.com просит подождать. Попробуй через минуту.':m==='net'?'Нет связи с Chess.com. Проверь интернет. У очень активных игроков архив бывает огромным: тогда вставь PGN нужной партии.':'Не получилось загрузить ('+m+'). Можно вставить PGN ниже.')}};
 $('#list').onclick=e=>{const b=e.target.closest('[data-i]');if(b){const g=games[+b.dataset.i];openGame(g,g.w.toLowerCase()===user?'w':'b')}};
 $('#pb').onclick=()=>{const p=$('#p').value.trim();if(p)openGame({pgn:p})};
 $('#mv').onclick=e=>{const b=e.target.closest('[data-i]');if(b)go(+b.dataset.i)};
