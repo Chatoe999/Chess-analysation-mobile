@@ -1,19 +1,18 @@
-
 # Chess Analysis Mobile
 
 Мобильное приложение для анализа шахматных партий.
 
-## Android APK
+## 📲 Скачать приложение для Android
 
-Готовую Android-версию можно скачать здесь:
+**[⬇️ Скачать последнюю версию Chess Analysis (APK)](https://github.com/Chatoe999/Chess-analysation-mobile/releases/latest/download/ChessAnalysis.apk)**
 
-[📥 Скачать последнюю версию APK](https://github.com/Chatoe999/Chess-analysation-mobile/releases/latest)
+Нажми на ссылку выше, чтобы сразу скачать APK. Если прямая загрузка не началась, [открой страницу последнего релиза](https://github.com/Chatoe999/Chess-analysation-mobile/releases/latest) и скачай файл **ChessAnalysis.apk** в разделе **Assets**.
 
-Открой последнюю версию и скачай `app-debug.apk` в разделе Assets.
+Новый APK автоматически публикуется сюда после каждой успешной сборки GitHub Actions.
 
 ## Установка
 
-1. Скачай APK на Android.
-2. Открой файл `app-debug.apk`.
-3. Разреши установку из этого источника, если Android попросит.
+1. Дождись окончания загрузки файла **ChessAnalysis.apk**.
+2. Открой скачанный файл на Android.
+3. Разреши установку приложений из этого источника, если система попросит.
 4. Нажми «Установить».
