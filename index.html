@@ -18,7 +18,7 @@
 :root{--dim:#a3a7c0;font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,system-ui,sans-serif;color:#f5f6fc;background:#070614;color-scheme:dark;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{overscroll-behavior-y:none}body{margin:0}
-body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(45% 35% at 15% 10%,rgba(124,58,237,.6),transparent 70%),radial-gradient(40% 30% at 90% 35%,rgba(236,72,153,.38),transparent 70%),radial-gradient(55% 40% at 55% 100%,rgba(37,99,235,.55),transparent 70%)}
+body::before{content:"";position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;z-index:-1;pointer-events:none;transform:translateZ(0);background:radial-gradient(45% 35% at 15% 10%,rgba(124,58,237,.6),transparent 70%),radial-gradient(40% 30% at 90% 35%,rgba(236,72,153,.38),transparent 70%),radial-gradient(55% 40% at 55% 100%,rgba(37,99,235,.55),transparent 70%)}
 main{max-width:560px;margin:0 auto;padding:14px 14px 40px;display:grid;gap:12px}
 .v{display:grid;gap:12px}
 [hidden]{display:none!important}
@@ -29,7 +29,7 @@ button:disabled{opacity:.45;cursor:default}
 .me{--c:48,209,88}.op{--c:255,69,58}
 .dim,small{color:var(--dim)}
 h2{font-size:17px;margin:0 0 10px;letter-spacing:-.01em}
-.g{position:relative;background:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.04));-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border:1px solid rgba(255,255,255,.14);border-radius:22px;box-shadow:inset 0 1.5px 1px rgba(255,255,255,.38),inset 0 -1px 1px rgba(255,255,255,.07),0 12px 32px rgba(0,0,0,.35)}
+.g{position:relative;background:linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,255,255,.05)),rgba(14,12,36,.42);border:1px solid rgba(255,255,255,.14);border-radius:22px;box-shadow:inset 0 1.5px 1px rgba(255,255,255,.38),inset 0 -1px 1px rgba(255,255,255,.07),0 6px 16px rgba(0,0,0,.25)}
 .pad{padding:14px}
 .bar{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 10px 18px}
 .logo{font-size:22px;font-weight:800;letter-spacing:-.03em;background:linear-gradient(180deg,#fff,#9ca1bb 60%,#e8eaf6);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -47,12 +47,12 @@ summary{font-weight:600;cursor:pointer;margin-bottom:10px}
 .row{display:flex;align-items:center;justify-content:space-between}
 #pg{height:4px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
 #pg i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#38bdf8);transition:width .2s}
-.pl{display:flex;align-items:baseline;gap:8px;padding:9px 14px;border-radius:16px;background:linear-gradient(rgba(var(--c),.3),rgba(var(--c),.12));border:1px solid rgba(var(--c),.55);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);cursor:pointer}
+.pl{display:flex;align-items:baseline;gap:8px;padding:9px 14px;border-radius:16px;background:linear-gradient(rgba(var(--c),.3),rgba(var(--c),.12));border:1px solid rgba(var(--c),.55);cursor:pointer}
 .pl span{margin-left:auto;font-size:12px;font-weight:700;color:rgb(var(--c))}
 .bw{display:flex;gap:8px}
 #bar{width:14px;flex:none;border-radius:9px;background:#1b1c2c;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,.2)}
 #bar i{position:absolute;inset:auto 0 0;background:#f5f6fc;height:50%;transition:height .35s}
-#bd{flex:1;min-width:0;aspect-ratio:1;display:grid;grid:repeat(8,1fr)/repeat(8,1fr);position:relative;border-radius:16px;overflow:hidden;container-type:inline-size;border:1px solid rgba(255,255,255,.2);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+#bd{flex:1;min-width:0;aspect-ratio:1;display:grid;grid:repeat(8,1fr)/repeat(8,1fr);position:relative;border-radius:16px;overflow:hidden;container-type:inline-size;border:1px solid rgba(255,255,255,.2);box-shadow:0 8px 20px rgba(0,0,0,.4)}
 .s{position:relative;display:grid;place-items:center}
 .s.l{background:#cfd3ec}.s.d{background:#6b70a8}
 .s.h::after{content:"";position:absolute;inset:0;background:rgb(var(--c));opacity:.55}
@@ -89,6 +89,7 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 li{padding-left:18px;position:relative}
 li::before{content:"";position:absolute;left:0;top:.5em;width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#38bdf8)}
 #dg{margin:0;padding:0 6px;font:11px/1.4 ui-monospace,monospace;white-space:pre-wrap;word-break:break-word;color:#ffb4a9}
+#sum,#tips{content-visibility:auto;contain-intrinsic-size:auto 420px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -132,9 +133,8 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:8px;height:8px;bor
 const $=s=>document.querySelector(s),MATE=1e4,CS='abcdefgh';
 const K={brilliant:['Блестящий ход','!!','#26c9c3'],great:['Отличный ход','!','#5b8def'],best:['Лучший ход','★','#81b64c'],excellent:['Очень хороший ход','✓','#96bc4b'],good:['Хороший ход','✓','#8fa876'],book:['Дебютный ход','≡','#a88865'],inacc:['Неточность','?!','#f7c631'],mistake:['Ошибка','?','#ffa459'],miss:['Упущенный шанс','✕','#ff7769'],blunder:['Зевок','??','#fa412d']};
 const PG={k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟\uFE0E'},PV={p:1,n:3,b:3,r:5,q:9,k:0};
-/* Настройки движка: быстрый режим для телефона; MultiPV=2 остаётся включённым. */
-const ENGINE_DEPTH=10,ENGINE_MOVETIME=350;
-const ENG=['https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/stockfish.js','https://cdn.jsdelivr.net/npm/stockfish.js@10.0.2/stockfish.js'];
+const CJ='https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.2/';
+const ENG=[{u:CJ+'stockfish.wasm.js',w:CJ+'stockfish.wasm',t:10000},{u:'stockfish.js',t:5000},{u:CJ+'stockfish.js',t:25000},{u:'https://cdn.jsdelivr.net/npm/stockfish.js@10.0.2/stockfish.js',t:25000}];
 const ENGLOG=[];
 const dbg=t=>{const d=$('#dg');d.hidden=false;d.textContent+=t+'\n'};
 addEventListener('error',e=>dbg('Ошибка: '+e.message));
@@ -147,10 +147,11 @@ const SRC={
  chesscom:{n:'Chess.com',async games(u){
   const j=async x=>{const r=await fetch(x);if(!r.ok)throw 0;return r.json()};
   const a=(await j('https://api.chess.com/pub/player/'+encodeURIComponent(u)+'/games/archives')).archives||[];
-  const batches=await Promise.all(a.slice(-3).reverse().map(j));
-const o=batches.flatMap(x=>(x.games||[]).slice().reverse().filter(g=>g.pgn));
-return o.slice(0,20).map(g=>({pgn:g.pgn,w:g.white.username,b:g.black.username,wr:g.white.rating,br:g.black.rating,rs:{w:g.white.result,b:g.black.result},tc:g.time_class,t:g.end_time}))
-}}};
+  let o=[];
+  for(const x of a.slice(-3).reverse()){o.push(...(await j(x)).games.reverse().filter(g=>g.pgn));if(o.length>=20)break}
+  return o.slice(0,20).map(g=>({pgn:g.pgn,w:g.white.username,b:g.black.username,wr:g.white.rating,br:g.black.rating,rs:{w:g.white.result,b:g.black.result},tc:g.time_class,t:g.end_time}))}},
+ lichess:{n:'Lichess (скоро)',soon:1}
+};
 
 let G,W,ply=0,flip=0,run=0,SK='chesscom',games=[],user='';
 const wp=c=>1/(1+Math.exp(-.00368208*c));
@@ -163,16 +164,21 @@ const msg=t=>{$('#msg').textContent=t};
 const show=v=>{$('#home').hidden=v!=='home';$('#an').hidden=v!=='an'};
 
 /* ---------- движок ---------- */
-function startEngine(i=0){return new Promise((ok,no)=>{
- if(i>=ENG.length)return no();
- const u=ENG[i],net=/^https?:/.test(u),nm=net?u.split('/')[2]:'файл рядом с index.html';
- const nx=why=>{ENGLOG.push('Движок '+(i+1)+'/'+ENG.length+' ('+nm+'): '+why);startEngine(i+1).then(ok,no)};
- $('#st').textContent='Загрузка движка '+(i+1)+'/'+ENG.length+'…';
+const ord=()=>{let q=-1;try{q=+localStorage.eng}catch(e){}const a=ENG.map((_,i)=>i);return a.includes(q)?[q,...a.filter(x=>x!==q)]:a};
+function mkW(e){
+ if(!/^https?:/.test(e.u))return new Worker(e.u);
+ const pre=e.w?'const SFW="'+e.w+'",SFF=self.fetch,SFM=a=>String(a).indexOf("stockfish.wasm")>-1;self.fetch=(a,b)=>SFF(SFM(a)?SFW:a,b);const SFO=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,a){arguments[1]=SFM(a)?SFW:a;return SFO.apply(this,arguments)};':'';
+ return new Worker(URL.createObjectURL(new Blob([pre+'importScripts("'+e.u+'")'],{type:'text/javascript'})))}
+function startEngine(o=ord(),k=0){return new Promise((ok,no)=>{
+ if(k>=o.length)return no();
+ const i=o[k],e=ENG[i],net=/^https?:/.test(e.u),nm=net?e.u.split('/')[2]+(e.w?' (wasm)':''):'файл рядом с index.html';
+ const nx=why=>{ENGLOG.push('Движок '+(k+1)+'/'+o.length+' ('+nm+'): '+why);startEngine(o,k+1).then(ok,no)};
+ $('#st').textContent='Загрузка движка '+(k+1)+'/'+o.length+'…';
  let w;
- try{w=net?new Worker(URL.createObjectURL(new Blob(['importScripts("'+u+'")'],{type:'text/javascript'}))):new Worker(u)}catch(e){return nx('не запустился ('+e.message+')')}
- const t=setTimeout(()=>{w.terminate();nx('нет ответа за 25 с')},25000);
- w.onerror=e=>{clearTimeout(t);w.terminate();nx('ошибка загрузки'+(e&&e.message?': '+e.message:''))};
- w.onmessage=e=>{if(String(e.data).includes('uciok')){clearTimeout(t);w.onerror=null;ok(w)}};
+ try{w=mkW(e)}catch(x){return nx('не запустился ('+x.message+')')}
+ const t=setTimeout(()=>{w.terminate();nx('нет ответа за '+e.t/1000+' с')},e.t);
+ w.onerror=x=>{clearTimeout(t);w.terminate();nx('ошибка загрузки'+(x&&x.message?': '+x.message:''))};
+ w.onmessage=x=>{if(String(x.data).includes('uciok')){clearTimeout(t);w.onerror=null;w.wasm=!!e.w;try{localStorage.eng=i}catch(y){}ok(w)}};
  w.postMessage('uci')})}
 
 function ev(i){
@@ -184,9 +190,7 @@ function ev(i){
     const n=+((/multipv (\d+)/.exec(t)||[0,1])[1]),v=+sc[2];
     L[n-1]={cp:s*(sc[1]==='cp'?v:(v>0?1:-1)*(MATE-Math.abs(v)*10)),pv:t.split(' pv ')[1].trim().split(' ')}}
    else if(t.startsWith('bestmove')){const l=L.filter(Boolean);ok({l:l.length?l:[{cp:0,pv:[]}]})}};
-  // Меньше глубина и время на позицию сокращают общий разбор длинных партий.
-  W.postMessage('position fen '+fen);
-  W.postMessage('go depth '+ENGINE_DEPTH+' movetime '+ENGINE_MOVETIME)})}
+  W.postMessage('position fen '+fen);W.postMessage('go depth '+(W.wasm?14:11)+' movetime '+(W.wasm?350:500))})}
 
 /* ---------- оценка ходов ---------- */
 function sac(i){const m=G.mv[i-1],pv=G.E[i].l[0].pv;if(PV[m.piece]<3||!pv[0])return 0;
@@ -229,9 +233,7 @@ async function analyze(){
  catch(e){ENGLOG.forEach(dbg);$('#st').textContent='Движок не загрузился, причины ниже';return}
  if(id!==run){W.terminate();return}
  for(let i=0;i<n;i++){G.E[i]=await ev(i);if(id!==run)return;if(i)grade(i);
-  $('#st').textContent='Анализ '+i+'/'+(n-1);
-  $('#pg i').style.width=100*i/(n-1||1)+'%';
-  if(i%8===0||i===n-1)render()}
+  $('#st').textContent='Анализ '+i+'/'+(n-1);$('#pg i').style.width=100*i/(n-1||1)+'%';if(i===ply||i%5===0||i===n-1)render()}
  const S={w:{},b:{}},A={w:[],b:[]};
  G.mv.forEach((m,j)=>{const k=G.k[j+1];S[m.color][k]=(S[m.color][k]||0)+1;A[m.color].push(G.ac[j+1])});
  const acc=x=>x.length?Math.round(x.reduce((p,c)=>p+c,0)/x.length):0;
@@ -259,11 +261,13 @@ function render(){if(!G)return;
  else if(!k)c='<div class="hd"><b>'+m.san+'</b>'+tg+'</div><p class="dim">Ход ещё анализируется…</p>';
  else c='<div class="hd"><b>'+m.san+'</b>'+tg+'<span class="kb" style="--k:'+K[k][2]+'">'+K[k][1]+' '+K[k][0]+'</span><span class="ev">'+fmt(E.l[0].cp)+'</span></div><p>'+say(ply)+'</p>'+(bm?'<p class="dim">Лучший ход: <b>'+san(g.fens[ply-1],bm)+'</b></p>':'');
  $('#card').className='g pad card '+own;$('#card').innerHTML=c;
- let ml='';
- g.mv.forEach((x,j)=>{const i=j+1,kk=g.k[i];if(x.color==='w')ml+='<em>'+Math.ceil(i/2)+'.</em>';
-  ml+='<button class="ch '+(x.color===g.me?'me':'op')+(i===ply?' on':'')+'" data-i="'+i+'">'+(kk?'<span class="dot" style="--k:'+K[kk][2]+'">'+K[kk][1]+'</span>':'')+x.san+'</button>'});
- const mv=$('#mv'),st=mv.scrollTop;mv.innerHTML=ml;mv.scrollTop=st;
- if(g.done){const me=g.me,op=me==='w'?'b':'w',col=c=>'<div class="'+(c===me?'me':'op')+'"><b>'+(c===me?'Ты':'Соперник')+'</b><br><small>'+(c==='w'?g.w:g.b)+'</small><div class="big">'+g.A[c]+'<small>%</small></div><small>точность</small></div>';
+ const lk=g.k.length+'|'+g.me,mv=$('#mv');
+ if(g.lk!==lk){g.lk=lk;let ml='';
+  g.mv.forEach((x,j)=>{const i=j+1,kk=g.k[i];if(x.color==='w')ml+='<em>'+Math.ceil(i/2)+'.</em>';
+   ml+='<button class="ch '+(x.color===g.me?'me':'op')+'" data-i="'+i+'">'+(kk?'<span class="dot" style="--k:'+K[kk][2]+'">'+K[kk][1]+'</span>':'')+x.san+'</button>'});
+  const st=mv.scrollTop;mv.innerHTML=ml;mv.scrollTop=st}
+ const po=mv.querySelector('.on'),pn=mv.querySelector('[data-i="'+ply+'"]');if(po)po.classList.remove('on');if(pn)pn.classList.add('on');
+ if(g.done&&g.sk!==g.me){g.sk=g.me;const me=g.me,op=me==='w'?'b':'w',col=c=>'<div class="'+(c===me?'me':'op')+'"><b>'+(c===me?'Ты':'Соперник')+'</b><br><small>'+(c==='w'?g.w:g.b)+'</small><div class="big">'+g.A[c]+'<small>%</small></div><small>точность</small></div>';
   $('#sum').hidden=0;
   $('#sum').innerHTML='<h2>Итоги партии</h2><div class="two">'+col(me)+col(op)+'</div><div class="tr"><span></span><span></span><b class="me">Ты</b><b class="op">Соп.</b></div>'+Object.keys(K).map(k=>'<div class="tr"><span class="dot" style="--k:'+K[k][2]+'">'+K[k][1]+'</span><span>'+K[k][0]+'</span><b class="me">'+(g.S[me][k]||0)+'</b><b class="op">'+(g.S[op][k]||0)+'</b></div>').join('');
   $('#tips').hidden=0;$('#tips').innerHTML='<h2>Советы на следующие партии</h2><ul>'+tips().map(t=>'<li>'+t+'</li>').join('')+'</ul>'}
